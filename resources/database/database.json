@@ -7,7 +7,7 @@
     },
     "bacpacUrl": {
       "type": "string"
-    }
+    },
     "sqlServerNamePrefix": {
       "type": "string"
     },
