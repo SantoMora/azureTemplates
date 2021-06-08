@@ -7,9 +7,6 @@
     },
     "functionStorageAccountName": {
       "value": "afstorage"
-    },
-    "location": {
-      "value": "[resourceGroup().location]"
     }
   }
 }
