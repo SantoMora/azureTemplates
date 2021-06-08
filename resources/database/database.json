@@ -1,0 +1,81 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerNamePrefix": {
+      "type": "string"
+    },
+    "userAdmin": {
+      "type": "string"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    },
+    "databaseName": {
+      "type": "string"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "serverName": "[concat(parameters('sqlServerNamePrefix'), uniqueString(resourceGroup().id))]"
+  },
+  "resources": [
+    {
+      "name": "[variables('serverName')]",
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2020-08-01-preview",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "env": "mau"
+      },
+      "properties": {
+        "administratorLogin": "[parameters('userAdmin')]",
+        "administratorLoginPassword": "[parameters('adminPassword')]",
+        "version": "12.0",
+        "publicNetworkAccess": "Enabled"
+      },
+      "resources": [
+        {
+          "name": "AllowAllWindowsAzureIps",
+          "type": "firewallrules",
+          "location": "East US",
+          "apiVersion": "2020-08-01-preview",
+          "dependsOn": [
+            "[variables('serverName')]"
+          ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "type": "databases",
+          "apiVersion": "2020-08-01-preview",
+          "name": "[parameters('databaseName')]",
+          "location": "[resourceGroup().location]",
+          "kind": "V12.0",
+          "tags": {
+            "env": "mau"
+          },
+          "dependsOn": [
+            "[variables('serverName')]"
+          ],
+          "sku": {
+            "name": "Basic",
+            "tier": "Basic",
+            "capacity": 5
+          },
+          "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "maxSizeBytes": 2147483648,
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "storageAccountType": "GRS"
+          }
+        }
+      ]
+    } 
+  ],
+  "outputs": {}
+}
