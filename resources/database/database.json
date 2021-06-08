@@ -1,7 +1,13 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {
+  "parameters": {         
+    "storageKey": {
+      "type": "string"
+    },
+    "bacpacUrl": {
+      "type": "string"
+    }
     "sqlServerNamePrefix": {
       "type": "string"
     },
@@ -72,7 +78,25 @@
             "zoneRedundant": false,
             "readScale": "Disabled",
             "storageAccountType": "GRS"
-          }
+          },
+          "resources": [
+            {
+              "type": "extensions",
+              "apiVersion": "2020-08-01-preview",
+              "name": "ImportDB",
+              "dependsOn": [
+                "[parameters('databaseName')]"
+              ],
+              "properties": {
+                "storageKeyType": "StorageAccessKey",
+                "stotageKey": "[parameters('storageKey')]",
+                "storageUri": "[parameters('bacpacUrl')]",
+                "administratorLogin": "[parameters('userAdmin')]",
+                "administratorLoginPassword": "[parameters('adminPassword')]",
+                "operationMode": "Import"
+              }
+            }
+          ]
         }
       ]
     } 
