@@ -1,0 +1,114 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "datalakeStorageAccountName": {
+      "type": "string"
+    },
+    "functionStorageAccountName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "storageNameDL": "[concat(parameters('datalakeStorageAccountName'), uniqueString(resourceGroup().id))]",
+    "storageNameAF": "[concat(parameters('functionStorageAccountName'), uniqueString(resourceGroup().id))]"
+  },
+  "resources": [
+     {
+      "apiVersion": "2019-06-01",
+      "kind": "StorageV2",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageNameAF')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "env": "mau"
+      },
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "TLS1_2"
+      },
+      "resources": [        
+        {
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "name": "[concat('default/', 'backups')]",
+          "dependsOn": [
+            "[variables('storageNameAF')]"
+          ],
+          "properties": {
+            "publicAccess": "None"
+          }
+        }
+      ]
+    },
+    {
+      "name": "[variables('storageNameDL')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2019-06-01",
+      "location": "[parameters('location')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS"
+      },      
+      "resources": [     
+        {
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "name": "[concat('default/', 'source')]",
+          "dependsOn": [
+            "[variables('storageNameDL')]"
+          ],
+          "properties": {
+            "publicAccess": "None"
+          }
+        },   
+        {
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "name": "[concat('default/', 'landing')]",
+          "dependsOn": [
+            "[variables('storageNameDL')]"
+          ],
+          "properties": {
+            "publicAccess": "None"
+          }
+        },
+        {
+          "type": "blobServices/containers",
+          "apiVersion": "2018-07-01",
+          "name": "[concat('default/', 'staging')]",
+          "dependsOn": [
+            "[variables('storageNameDL')]"
+          ],
+          "properties": {
+            "publicAccess": "None"
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "storageAF": {
+      "type": "string",
+      "value": "[variables('storageNameAF')]"
+    },
+    "storageAFConctStr": {
+      "type": "string",
+      "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageNameAF'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageNameAF')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+    },
+    "storageDL": {
+      "type": "string",
+      "value": "[variables('storageNameDL')]"
+    },
+    "storageDLConctStr": {
+      "type": "string",
+      "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageNameDL'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageNameDL')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+    }
+  }
+}
