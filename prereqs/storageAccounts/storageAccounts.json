@@ -103,6 +103,10 @@
       "type": "string",
       "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageNameAF'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageNameAF')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
     },
+    "storageAFKey": {
+      "type": "string",
+      "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageNameAF')), '2019-06-01').keys[0].value]"
+    },
     "storageDL": {
       "type": "string",
       "value": "[variables('storageNameDL')]"

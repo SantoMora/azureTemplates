@@ -37,7 +37,7 @@ if($prereq) {
   Write-Output "Deploying Resources" 
   az deployment group create -g $resourceGroup `
     --template-file ./template.json `
-    --parameters storageKey=$prereq.storageAF.value bacpacUrl=$bacpac[0].Blob adminPassword=$adminPass
+    --parameters storageKey=$prereq.storageAFKey.value bacpacUrl=$bacpac[0].Blob adminPassword=$adminPass
   
 } else {
   Write-Output "Can't continue because prereq deploy error..."
