@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageKey": {
+      "type": "string"
+    },
+    "bacpacUrl": {
+      "type": "string"
+    },
+    "sqlServerNamePrefix": {
+      "type": "string",
+      "defaultValue": "kpmgsqlserver"
+    },    
+    "userAdmin": {
+      "type": "string",
+      "defaultValue": "mau"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    },
+    "databaseName": {
+      "type": "string",
+      "defaultValue": "kpmgDB"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "databaseTemplate": "https://raw.githubusercontent.com/SantoMora/azureTemplates/dev/resources/database/database.json"
+    //"databaseParameters": "https://raw.githubusercontent.com/SantoMora/azureTemplates/dev/resources/database/database.parameters.json"
+  },
+  "resources": [
+    {
+      "name": "Database",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('databaseTemplate')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {          
+          "storageKey": {
+            "value": "[parameters('storageKey')]"
+          },
+          "bacpacUrl": {
+            "value": "[parameters('bacpacUrl')]"
+          },
+          "sqlServerNamePrefix": {
+            "value": "[parameters('sqlServerNamePrefix')]"
+          },    
+          "userAdmin": {
+            "value": "[parameters('userAdmin')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "databaseName": {
+            "value": "[parameters('databaseName')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
